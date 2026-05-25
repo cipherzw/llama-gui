@@ -10,7 +10,7 @@ class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
         self.setWindowTitle("LLaMA GUI")
-        self.resize(1200, 700)  # 加宽以容纳三栏
+        self.resize(1920, 1000)
 
         # ---------- 菜单栏 ----------
         menubar = self.menuBar()
@@ -31,19 +31,14 @@ class MainWindow(QMainWindow):
         self.preview_edit.setStyleSheet("font-family: Consolas, monospace;")
         splitter.addWidget(self.preview_edit)
 
-        # ---- 中栏：上下两部分布局 ----
-        # 使用垂直布局将中间栏分为上下两部分
+        # ---- 中栏：文件导入和参数设置 ----
         center_widget = QWidget()
         center_layout = QVBoxLayout(center_widget)
+        center_layout.setContentsMargins(10, 10, 10, 10)
         
-        # --- 上半部分：导入文件路径和按钮 ---
-        top_widget = QWidget()
-        top_layout = QVBoxLayout(top_widget)
-        top_layout.setContentsMargins(10, 10, 10, 10)
-        
-        # llama-server.exe 文件导入部分（新增行）
+        # 1. 服务程序
         server_row_layout = QHBoxLayout()
-        server_row_layout.addWidget(QLabel("llama-server.exe:"))
+        server_row_layout.addWidget(QLabel("服务程序:"))
         self.server_path_edit = QLineEdit()
         self.server_path_edit.setPlaceholderText("llama-server.exe")
         self.server_path_edit.setText("llama-server.exe")
@@ -51,9 +46,20 @@ class MainWindow(QMainWindow):
         self.server_import_btn = QPushButton("导入")
         self.server_import_btn.clicked.connect(self.import_server_file)
         server_row_layout.addWidget(self.server_import_btn)
-        top_layout.addLayout(server_row_layout)
+        center_layout.addLayout(server_row_layout)
         
-        # 模型文件导入部分（单行）
+        # 2. 帮助文件
+        help_row_layout = QHBoxLayout()
+        help_row_layout.addWidget(QLabel("帮助文件:"))
+        self.help_path_edit = QLineEdit()
+        self.help_path_edit.setPlaceholderText("help.txt")
+        help_row_layout.addWidget(self.help_path_edit)
+        self.help_import_btn = QPushButton("导入")
+        self.help_import_btn.clicked.connect(self.import_help_file)
+        help_row_layout.addWidget(self.help_import_btn)
+        center_layout.addLayout(help_row_layout)
+        
+        # 3. 模型文件
         model_row_layout = QHBoxLayout()
         model_row_layout.addWidget(QLabel("模型文件:"))
         self.model_path_edit = QLineEdit()
@@ -62,9 +68,9 @@ class MainWindow(QMainWindow):
         self.model_import_btn = QPushButton("导入")
         self.model_import_btn.clicked.connect(self.import_model_file)
         model_row_layout.addWidget(self.model_import_btn)
-        top_layout.addLayout(model_row_layout)
+        center_layout.addLayout(model_row_layout)
         
-        # 多模态文件导入部分（单行）
+        # 4. 视觉文件
         multimodal_row_layout = QHBoxLayout()
         multimodal_row_layout.addWidget(QLabel("视觉文件:"))
         self.multimodal_path_edit = QLineEdit()
@@ -73,13 +79,10 @@ class MainWindow(QMainWindow):
         self.multimodal_import_btn = QPushButton("导入")
         self.multimodal_import_btn.clicked.connect(self.import_multimodal_file)
         multimodal_row_layout.addWidget(self.multimodal_import_btn)
-        top_layout.addLayout(multimodal_row_layout)
+        center_layout.addLayout(multimodal_row_layout)
         
-        center_layout.addWidget(top_widget)
-        
-        # --- 下半部分：参数设置标签页 ---
+        # 参数设置标签页
         self.tab_widget = QTabWidget()
-        # 添加四个参数分类页（占位）
         self.add_parameter_tab("基础参数")
         self.add_parameter_tab("模型参数")
         self.add_parameter_tab("高级参数")
@@ -135,6 +138,17 @@ class MainWindow(QMainWindow):
         )
         if path:
             self.model_path_edit.setText(path)
+
+    def import_help_file(self):
+        """导入帮助文件路径 (默认 *.txt)"""
+        path, _ = QFileDialog.getOpenFileName(
+            self,
+            "选择帮助文件",
+            "",
+            "文本文件 (*.txt);;所有文件 (*.*)"
+        )
+        if path:
+            self.help_path_edit.setText(path)
 
     def import_multimodal_file(self):
         """导入多模态文件路径"""
